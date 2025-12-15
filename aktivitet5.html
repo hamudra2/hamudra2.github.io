@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Logs</title>
+<style>
+body {
+    font-family: Comfortaa, sans-serif;
+}
+.log {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+</style>
+</head>
+<body>
+
+<h1>Saved Times</h1>
+<div id="logs"></div>
+
+<a href="index.html">← Back</a>
+
+<script>
+    const logsDiv = document.getElementById("logs");
+    const logs = JSON.parse(localStorage.getItem("timeLogs")) || [];
+
+    if (logs.length === 0) {
+        logsDiv.textContent = "No logs yet.";
+    } else {
+        logs.forEach(log => {
+            const div = document.createElement("div");
+            div.className = "log";
+            div.textContent = `${log.time} — ${log.date}`;
+            logsDiv.appendChild(div);
+        });
+    }
+</script>
+
+</body>
+</html>
