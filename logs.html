@@ -14,47 +14,65 @@
 
 <div class="logs-container">
 	<h2 class="logs-h2">Historia</h2>
-	<div id="energyLogList"></div>
+  <ul id="energyLogList"></ul>
+</button>
 </div>
 
-<ul id="energyLogList"></ul>
-
 <script>
-window.addEventListener("DOMContentLoaded", function () {
-    let energyLogs = JSON.parse(localStorage.getItem("energyLogs")) || [];
+document.addEventListener("DOMContentLoaded", () => {
+  const list = document.getElementById("energyLogList");
 
-    const list = document.getElementById("energyLogList");
+  const energyLogs = JSON.parse(localStorage.getItem("energyLogs")) || [];
+  const activityLogs = JSON.parse(localStorage.getItem("activityLogs")) || [];
 
-    if (energyLogs.length === 0) {
-        list.innerHTML = "<li>Inga loggar än.</li>";
-        return;
-    }
+  const combined = [];
 
-    energyLogs.forEach(value => {
-        const li = document.createElement("li");
-        li.textContent = value + "%";
-        list.appendChild(li);
+  energyLogs.forEach(log => {
+    if (!log.timestamp) return;
+
+    combined.push({
+      timestamp: log.timestamp,
+      html: `
+        <strong>${log.date} ${log.time}</strong><br>
+        Energi: ${log.value}%
+        <hr>
+      `
     });
+  });
+
+  activityLogs.forEach(log => {
+    if (!log.timestamp) return;
+
+    combined.push({
+      timestamp: log.timestamp,
+      html: `
+        <strong>${log.startDate} ${log.startTime}</strong><br>
+        Aktivitet: ${log.activity}<br>
+        Läge: ${log.mode === "timer" ? "Timer" : "Stoppur"}<br>
+        Energi före: ${log.energyBefore}%<br>
+        Energi efter: ${log.energyAfter}%<br>
+        Skillnad: ${log.energyDiff}%<br>
+        Tid: ${log.durationText}
+        <hr>
+      `
+    });
+  });
+
+  combined.sort((a, b) => b.timestamp - a.timestamp);
+
+  if (combined.length === 0) {
+    list.innerHTML = "<li>Inga loggar än.</li>";
+    return;
+  }
+
+  combined.forEach(entry => {
+    const li = document.createElement("li");
+    li.innerHTML = entry.html;
+    list.appendChild(li);
+  });
 });
-
-const logs = JSON.parse(localStorage.getItem("activityLogs")) || [];
-const list = document.getElementById("energyLogList");
-
-logs.forEach(log => {
-  const li = document.createElement("li");
-  li.innerHTML = `
-    <strong>${log.startDate}</strong><br>
-    Aktivitet: ${log.activity}<br>
-    Energi före: ${log.energyBefore}%<br>
-    Energi efter: ${log.energyAfter}%<br>
-    Skillnad: ${log.energyDiff}%<br>
-    Tid: ${log.durationText}
-    <hr>
-  `;
-  list.appendChild(li);
-});
-
 </script>
+
 
 
 
