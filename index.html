@@ -30,7 +30,7 @@
 
 <div class="buttons-container">
 	<div id="button2" class="button2"><button type="button2">Starta Aktivitet</button></div>
-	<a href='test2.html'><div id="button3" class="button3"><button type="button3">Outfits</button></div></a>
+	<a href='outfits.html'><div id="button3" class="button3"><button type="button3">Outfits</button></div></a>
 	<a href='logs.html'><div id="button1" class="button1"><button type="button1">Historia</button></div></a>
 </div>
 </div>
@@ -78,18 +78,22 @@
       <p id="activityenergyText">Har Energi</p>
     </div>
 
-    <h2>Vilken aktivitet ska du göra?</h2>
+	<div class="activityModeContainer">
+		<button id="modeStopwatch" class="modeBtn selected">Stoppur</button>
+		<button id="modeTimer" class="modeBtn">Timer</button>
+	</div>
 
-    <!-- ACTIVITY BUTTONS -->
-    <div class="activityBtnGrid">
-      <button class="activityBtn" data-activity="Diska">Diska</button>
-      <button class="activityBtn" data-activity="Städa Sovrummet">Städa Sovrummet</button>
-      <button class="activityBtn" data-activity="Studera">Studera</button>
-      <button class="activityBtn" data-activity="Dammsug">Dammsug</button>
+	<h2>Vilken aktivitet ska du göra?</h2>
+	<!-- ACTIVITY BUTTONS -->
+	<div class="activityBtnGrid">
+		<button class="activityBtn" data-activity="Diska">Diska</button>
+		<button class="activityBtn" data-activity="Städa Sovrummet">Städa Sovrummet</button>
+		<button class="activityBtn" data-activity="Studera">Studera</button>
+		<button class="activityBtn" data-activity="Dammsug">Dammsug</button>
 
-      <button id="activityBtnClose" class="activityBtnClose">Avbryt</button>
-      <button id="activityStartBtn" class="activityStartBtn">Starta</button>
-    </div>
+		<button id="activityBtnClose" class="activityBtnClose">Avbryt</button>
+		<button id="activityStartBtn" class="activityStartBtn">Starta</button>
+	</div>
 
   </div>
 </div>
