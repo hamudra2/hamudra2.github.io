@@ -1,178 +1,263 @@
-const slider = document.getElementById("energySlider");
-const energyText = document.getElementById("energyText");
-const percentageLabel = document.getElementById("percentageLabel");
+/* =========================
+   CONFIG
+========================= */
 
-const activityslider = document.getElementById("activityenergySlider");
-const activityenergyText = document.getElementById("activityenergyText");
-const activitypercentageLabel = document.getElementById("activitypercentageLabel");
+const ENERGY_KEY = "sharedEnergy";
 
-const readonlySlider = document.getElementById("readonlySlider-slider");
-const displayValue = document.getElementById("displayValue");
+/* =========================
+   HELPERS
+========================= */
+
+const $ = (id) => document.getElementById(id);
+const $$ = (selector) => document.querySelectorAll(selector);
+
+function saveEnergyLog(value) {
+  const logs = JSON.parse(localStorage.getItem("energyLogs")) || [];
+  const now = new Date();
+
+  logs.unshift({
+    type: "energy",
+    timestamp: now.getTime(),
+    date: now.toISOString().split("T")[0],
+    time: now.toLocaleTimeString("sv-SE", {
+      hour: "2-digit",
+      minute: "2-digit"
+    }),
+    value
+  });
+
+  localStorage.setItem("energyLogs", JSON.stringify(logs));
+}
 
 
-function updateValues(value) {
-	// Update text ranges
-	if (value < 1) {
-		energyText.textContent = "Helt utmattad";
-	} else if (value < 10) {
-		energyText.textContent = "Extremt Trött";
-	} else if (value < 20) {
-		energyText.textContent = "Väldigt Trött";
-	} else if (value < 30) {
-		energyText.textContent = "Ganska Trött";
-	} else if (value < 40) {
-		energyText.textContent = "Lite Trött";
-	} else if (value < 50) {
-		energyText.textContent = "Börjar Bli Trött";
-	} else if (value < 75) {
-		energyText.textContent = "Har Energi";
-	} else if (value < 100) {
-		energyText.textContent = "Mycket Energi";
-	} else {
-		energyText.textContent = "Helt Pigg";
-	}
 
-	// Update percentage label
-	percentageLabel.textContent = value + "%";
+function getEnergy() {
+  return Number(localStorage.getItem(ENERGY_KEY)) || 50;
+}
+
+function setEnergy(value) {
+  localStorage.setItem(ENERGY_KEY, value);
+}
+
+/* =========================
+   VIEWPORT FIX (mobile)
+========================= */
+
+function setVH() {
+  document.documentElement.style.setProperty(
+    "--vh",
+    `${window.innerHeight * 0.01}px`
+  );
+}
+
+setVH();
+window.addEventListener("resize", setVH);
+
+/* =========================
+   SLIDERS
+========================= */
+
+const energySlider = $("energySlider");
+const activitySlider = $("activityenergySlider");
+const finishSlider = $("finishEnergy");
+const readonlySlider = $("readonlySlider-slider");
+
+
+const percentageLabel = $("percentageLabel");
+const activityPercentageLabel = $("activitypercentageLabel");
+const finishPercentageLabel = $("finishpercentageLabel");
+
+const energyText = $("energyText");
+const activityEnergyText = $("activityenergyText");
+const finishEnergyText = $("finishenergyText");
+
+const ACTIVITY_DURATIONS = {
+  "Diska": 0.1,
+  "Studera": 30,
+  "Dammsug": 15,
+  "Städa Sovrummet": 15
 };
 
-slider.addEventListener("input", (e) => {
-	updateValues(e.target.value);
-});
 
-// Initialize on load
-updateValues(slider.value);
-
-
-
-
-function updateValues2(value) {
-	// Update text ranges
-	if (value < 1) {
-		activityenergyText.textContent = "Helt utmattad";
-	} else if (value < 10) {
-		activityenergyText.textContent = "Extremt Trött";
-	} else if (value < 20) {
-		activityenergyText.textContent = "Väldigt Trött";
-	} else if (value < 30) {
-		activityenergyText.textContent = "Ganska Trött";
-	} else if (value < 40) {
-		activityenergyText.textContent = "Lite Trött";
-	} else if (value < 50) {
-		activityenergyText.textContent = "Börjar Bli Trött";
-	} else if (value < 75) {
-		activityenergyText.textContent = "Har Energi";
-	} else if (value < 100) {
-		activityenergyText.textContent = "Mycket Energi";
-	} else {
-		activityenergyText.textContent = "Helt Pigg";
-	}
-
-	// Update percentage label
-	activitypercentageLabel.textContent = value + "%";
-};
-
-activityslider.addEventListener("input", (e) => {
-	updateValues2(e.target.value);
-});
-
-// Initialize on load
-updateValues2(activityslider.value);
+const sliders = [
+  energySlider,
+  activitySlider,
+  finishSlider,
+  readonlySlider
+].filter(Boolean);
 
 
+/* ---- Labels ---- */
+
+function energyLabel(value) {
+  if (value < 1) return "Helt utmattad";
+  if (value < 10) return "Extremt Trött";
+  if (value < 20) return "Väldigt Trött";
+  if (value < 30) return "Ganska Trött";
+  if (value < 40) return "Lite Trött";
+  if (value < 50) return "Börjar Bli Trött";
+  if (value < 75) return "Har Energi";
+  if (value < 100) return "Mycket Energi";
+  return "Helt Pigg";
+}
+
+/* ---- UI Sync ---- */
+
+function updateTexts(value) {
+  if (energyText) energyText.textContent = energyLabel(value);
+  if (activityEnergyText) activityEnergyText.textContent = energyLabel(value);
+  if (finishEnergyText) finishEnergyText.textContent = energyLabel(value);
+
+  if (percentageLabel) percentageLabel.textContent = value + "%";
+  if (activityPercentageLabel)
+    activityPercentageLabel.textContent = value + "%";
+  if (finishPercentageLabel)
+    finishPercentageLabel.textContent = value + "%";
+}
 
 
+function updateSliderFill(slider, value) {
+  const percent =
+    ((value - slider.min) / (slider.max - slider.min)) * 100;
 
-
-// Format date/time
-//const formatDate = (date) => {
-//	const year = date.getFullYear();
-//	const month = String(date.getMonth() + 1).padStart(2, "0"); // padStart makes the month start with 0 if it's less than 2 numbers
-//	const day = String(date.getDate()).padStart(2, "0");
-	
-//	return `${year}-${month}-${day}`;
-//};
-
-// Save button logic
-document.querySelector(".energyLogAcceptButton").addEventListener("click", function () {
-  const value = document.getElementById("energySlider").value;
-
-  // Retrieve existing logs or create a new empty array
-  let energyLogs = JSON.parse(localStorage.getItem("energyLogs")) || [];
-
-  // Add the new slider value
-  energyLogs.push(value);
-
-  // Save back to localStorage
-  localStorage.setItem("energyLogs", JSON.stringify(energyLogs));
-});
-
-
-const slider4 = document.getElementById("energySlider");
-
-const slider8 = document.getElementById("readonlySlider-slider");
-
-
-function updateSliderFill() {
-  const value = (slider4.value - slider4.min) / (slider4.max - slider4.min) * 100;
-
-  slider4.style.background = `
+  slider.style.background = `
     linear-gradient(
       to right,
       rgb(187, 169, 233) 0%,
-      rgb(187, 169, 233) ${value}%,
-      #d3d3d3 ${value}%,
-      #d3d3d3 100%
-    )
-  `;
-	
-  slider8.style.background = `
-    linear-gradient(
-      to right,
-      rgb(187, 169, 233) 0%,
-      rgb(187, 169, 233) ${value}%,
-      #d3d3d3 ${value}%,
+      rgb(187, 169, 233) ${percent}%,
+      #d3d3d3 ${percent}%,
       #d3d3d3 100%
     )
   `;
 }
 
-// Initialize + update on input
-slider4.addEventListener("input", updateSliderFill);
-updateSliderFill();
+function syncEnergyUI(value) {
+  sliders.forEach((slider) => {
+    slider.value = value;
+    updateSliderFill(slider, value);
+  });
 
-
-const slider6 = document.getElementById("activityenergySlider");
-
-function updateSliderFill2() {
-  const value = (slider6.value - slider6.min) / (slider6.max - slider6.min) * 100;
-
-  slider6.style.background = `
-    linear-gradient(
-      to right,
-      rgb(187, 169, 233) 0%,
-      rgb(187, 169, 233) ${value}%,
-      #d3d3d3 ${value}%,
-      #d3d3d3 100%
-    )
-  `;
+  updateTexts(value);
 }
 
-// Initialize + update on input
-slider6.addEventListener("input", updateSliderFill2);
-updateSliderFill2();
+/* ---- Attach Editable Sliders ---- */
 
+function attachSlider(slider) {
+  if (!slider || slider.disabled) return;
 
-
-function syncReadonlySlider(value) {
-  readonlySlider.value = value;
-  displayValue.textContent = value + "%";
+  slider.addEventListener("input", (e) => {
+    const value = e.target.value;
+    setEnergy(value);
+    syncEnergyUI(value);
+  });
 }
 
-energySlider.addEventListener("input", (e) => {
-  syncReadonlySlider(e.target.value);
+attachSlider(energySlider);
+attachSlider(activitySlider);
+attachSlider(finishSlider);
+
+
+/* ---- Init ---- */
+
+document.addEventListener("DOMContentLoaded", () => {
+  syncEnergyUI(getEnergy());
 });
 
-// Initialize on load
-syncReadonlySlider(energySlider.value);
+/* =========================
+   MODALS
+========================= */
 
+const nrgModal = $("energyLogModal");
+const nrgBtn = $("energyLogButton");
+const nrgClose = $$(".energyLogCloseButton")[0];
+const nrgAccept = $$(".energyLogAcceptButton")[0];
+
+const activityModal = $("activityModal");
+const activityBtn = $("button2");
+const activityClose = $("activityBtnClose");
+
+if (nrgBtn) nrgBtn.onclick = () => (nrgModal.style.display = "block");
+if (nrgClose) nrgClose.onclick = () => (nrgModal.style.display = "none");
+if (nrgAccept) {
+  nrgAccept.onclick = () => {
+    const value = getEnergy();
+    saveEnergyLog(value);
+    nrgModal.style.display = "none";
+  };
+}
+
+
+if (activityBtn)
+  activityBtn.onclick = () => (activityModal.style.display = "block");
+if (activityClose)
+  activityClose.onclick = () => (activityModal.style.display = "none");
+
+/* =========================
+   ACTIVITY SELECTION
+========================= */
+
+let selectedActivity = null;
+const startBtn = $("activityStartBtn");
+
+if (startBtn) startBtn.disabled = true;
+
+$$(".activityBtn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    $$(".activityBtn").forEach((b) => b.classList.remove("selected"));
+    btn.classList.add("selected");
+
+    selectedActivity = btn.dataset.activity;
+    if (startBtn) startBtn.disabled = false;
+  });
+});
+
+let activityMode = "stopwatch";
+
+const modeStopwatchBtn = $("modeStopwatch");
+const modeTimerBtn = $("modeTimer");
+
+if (modeStopwatchBtn && modeTimerBtn) {
+  modeStopwatchBtn.onclick = () => {
+    activityMode = "stopwatch";
+    modeStopwatchBtn.classList.add("selected");
+    modeTimerBtn.classList.remove("selected");
+  };
+
+  modeTimerBtn.onclick = () => {
+    activityMode = "timer";
+    modeTimerBtn.classList.add("selected");
+    modeStopwatchBtn.classList.remove("selected");
+  };
+}
+
+/* =========================
+   START ACTIVITY
+========================= */
+
+if (startBtn) {
+  startBtn.onclick = () => {
+    if (!selectedActivity) {
+      alert("Välj en aktivitet");
+      return;
+    }
+
+    const now = new Date();
+
+    localStorage.setItem(
+      "currentActivity",
+      JSON.stringify({
+        startTime: Date.now(),
+        startDate: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`,
+        activity: selectedActivity,
+				energyBefore: getEnergy(),
+				mode: activityMode,
+				durationMinutes:
+					activityMode === "timer"
+						? ACTIVITY_DURATIONS[selectedActivity]
+						: null
+      })
+    );
+
+    window.location.href = "aktivitet.html";
+  };
+}
