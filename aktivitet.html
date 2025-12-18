@@ -20,6 +20,14 @@
 	<button id="cancelSWBtn">Avbryt</button>
 	<button id="pauseSWBtn">Pausa</button>
 	<button id="finishSWBtn">Färdig</button>
+	
+
+	<div id="brajobbattext">Bra jobbat!</div>
+	<div id="brajobbatcontainer">
+		<img src="klarat-aktivitet.png" width="300px">
+	</div>
+
+
 <div id="finishModal" style="display:none">
   <h2>Hur mycket energi har du nu?</h2>
 	<span id="finishpercentageLabel">50%</span>
@@ -29,226 +37,247 @@
 </div>
 </div>
 
+<!-- On aktivitet.html, there is a small issue. When the timer is completed, if I then switch to another tab and then switch back, the stopwatch starts. --!>
+
 
 <script>
-    let startTime;
-    let elapsedBefore = 0;
-    let timerInterval;
-    let running = false;
-    let unloading = false; // <--- NEW
+	let startTime;
+	let elapsedBefore = 0;
+	let timerInterval;
+	let running = false;
+	let unloading = false; // <--- NEW
 
-    const pauseBtn = document.getElementById("pauseSWBtn");
-    const finishBtn = document.getElementById("finishSWBtn");
-    const cancelBtn = document.getElementById("cancelSWBtn");
+	const pauseBtn = document.getElementById("pauseSWBtn");
+	const finishBtn = document.getElementById("finishSWBtn");
+	const cancelBtn = document.getElementById("cancelSWBtn");
+	
+	const current = JSON.parse(localStorage.getItem("currentActivity"));
 
-    function formatTime(ms) {
-        const tenths = Math.floor(ms / 100) % 10;
-        const seconds = Math.floor(ms / 1000) % 60;
-        const minutes = Math.floor(ms / (1000 * 60)) % 60;
-        const hours = Math.floor(ms / (1000 * 60 * 60));
-        return (
-            String(hours).padStart(2, "0") + ":" +
-            String(minutes).padStart(2, "0") + ":" +
-            String(seconds).padStart(2, "0") + "." + tenths
-        );
-    }
+	const isTimer = current?.mode === "timer";
+	let remainingMs = current?.durationMinutes
+		? current.durationMinutes * 60 * 1000
+		: 0;
 
-    function updateDisplay() {
-        let total = elapsedBefore;
-        if (running) total += Date.now() - startTime;
-        document.getElementById("timer").textContent = formatTime(total);
-    }
+	function hideActivityUI() {
+		document.querySelector(".diskarcontainer")?.style.setProperty("display", "none");
+		pauseBtn.style.display = "none";
+		cancelBtn.style.display = "none";
+		finishBtn.style.display = "none";
 
-    function startStopwatch() {
-        running = true;
-        startTime = Date.now();
-        timerInterval = setInterval(updateDisplay, 100);
-        pauseBtn.textContent = "Pausa";
-        saveState();
-    }
+		document.getElementById("brajobbattext").style.display = "block";
+		document.getElementById("brajobbatcontainer").style.display = "flex";
+	}
 
-    function pauseStopwatch() {
-        if (!running) return;
-        running = false;
-        clearInterval(timerInterval);
-        elapsedBefore += Date.now() - startTime;
-        pauseBtn.textContent = "Återuppta";
-        saveState();
-    }
+	function formatTime(ms) {
+		const tenths = Math.floor(ms / 100) % 10;
+		const seconds = Math.floor(ms / 1000) % 60;
+		const minutes = Math.floor(ms / (1000 * 60)) % 60;
+		const hours = Math.floor(ms / (1000 * 60 * 60));
+		return (
+			String(hours).padStart(2, "0") + ":" +
+			String(minutes).padStart(2, "0") + ":" +
+			String(seconds).padStart(2, "0") + "." + tenths
+		);
+	}
 
-    function resumeStopwatch() {
-        if (running) return;
-        running = true;
-        startTime = Date.now();
-        timerInterval = setInterval(updateDisplay, 100);
-        pauseBtn.textContent = "Pausa";
-        saveState();
-    }
+	function updateDisplay() {
+		let total = elapsedBefore;
+		if (running) total += Date.now() - startTime;
+		document.getElementById("timer").textContent = formatTime(total);
+	}
 
-    function pauseToggle() {
-        running ? pauseStopwatch() : resumeStopwatch();
-    }
+	function startStopwatch() {
+		running = true;
+		startTime = Date.now();
+		timerInterval = setInterval(updateDisplay, 100);
+		pauseBtn.textContent = "Pausa";
+		saveState();
+	}
 
-		function finishStopwatch() {
-				pauseStopwatch();
-				document.getElementById("finishModal").style.display = "block";
+	function pauseStopwatch() {
+		if (!running) return;
+		running = false;
+		clearInterval(timerInterval);
+		elapsedBefore += Date.now() - startTime;
+		pauseBtn.textContent = "Återuppta";
+		saveState();
+	}
+
+	function resumeStopwatch() {
+		if (running) return;
+		running = true;
+		startTime = Date.now();
+		timerInterval = setInterval(updateDisplay, 100);
+		pauseBtn.textContent = "Pausa";
+		saveState();
+	}
+
+	function pauseToggle() {
+		running ? pauseStopwatch() : resumeStopwatch();
+	}
+	/*CHANGES HERE */
+	function finishStopwatch() {
+		pauseStopwatch();
+
+		const finishSlider = document.getElementById("finishEnergy");
+		const sharedEnergy = Number(localStorage.getItem("sharedEnergy")) || 50;
+
+		finishSlider.value = sharedEnergy;
+		finishSlider.dispatchEvent(new Event("input"));
+
+		document.getElementById("finishModal").style.display = "block";
+	}
+
+	function cancelStopwatch() {
+		running = false;
+		clearInterval(timerInterval);
+		elapsedBefore = 0;
+		document.getElementById("timer").textContent = "00:00:00.0";
+		pauseBtn.textContent = "Pausa";
+		localStorage.removeItem("stopwatchState");
+	}
+
+	function saveState() {
+		localStorage.setItem("stopwatchState", JSON.stringify({
+			elapsedBefore,
+			running,
+			startTime: running ? startTime : null
+		}));
+	}
+
+	function loadState() {
+		const saved = localStorage.getItem("stopwatchState");
+		if (!saved) return;
+
+		const state = JSON.parse(saved);
+		elapsedBefore = state.elapsedBefore || 0;
+		running = state.running;
+
+		if (running) {
+			const delta = Date.now() - state.startTime;
+			startTime = Date.now() - delta;
+			timerInterval = setInterval(updateDisplay, 100);
+			pauseBtn.textContent = "Pausa";
+		} else {
+			pauseBtn.textContent = "Återuppta";
 		}
+	}
 
-    function cancelStopwatch() {
-        running = false;
-        clearInterval(timerInterval);
-        elapsedBefore = 0;
-        document.getElementById("timer").textContent = "00:00:00.0";
-        pauseBtn.textContent = "Pausa";
-        localStorage.removeItem("stopwatchState");
-    }
+	// --- FIXED: Do NOT auto-pause during page reload ---
+	window.addEventListener("beforeunload", () => {
+		unloading = true;
+		saveState();
+	});
 
-    function saveState() {
-        localStorage.setItem("stopwatchState", JSON.stringify({
-            elapsedBefore,
-            running,
-            startTime: running ? startTime : null
-        }));
-    }
+	document.addEventListener("visibilitychange", () => {
+		if (unloading) return;  // prevents incorrect pause on reload
 
-    function loadState() {
-        const saved = localStorage.getItem("stopwatchState");
-        if (!saved) return;
+		if (document.hidden) pauseStopwatch();
+		else resumeStopwatch();
+	});
 
-        const state = JSON.parse(saved);
-        elapsedBefore = state.elapsedBefore || 0;
-        running = state.running;
+	// Buttons
+	pauseBtn.onclick = pauseToggle;
+	finishBtn.onclick = finishStopwatch;
+	cancelBtn.onclick = cancelStopwatch;
 
-        if (running) {
-            const delta = Date.now() - state.startTime;
-            startTime = Date.now() - delta;
-            timerInterval = setInterval(updateDisplay, 100);
-            pauseBtn.textContent = "Pausa";
-        } else {
-            pauseBtn.textContent = "Återuppta";
-        }
-    }
+	// Load state on entry
+	loadState();
+	updateDisplay();
 
-    // --- FIXED: Do NOT auto-pause during page reload ---
-    window.addEventListener("beforeunload", () => {
-        unloading = true;
-        saveState();
-    });
+	//if (!running) startStopwatch();
+	//
+	//
+	//
+	//maybe fix?
+	//
+	//
+	//
+	if (isTimer) startTimer();
+	else startStopwatch();
 
-    document.addEventListener("visibilitychange", () => {
-        if (unloading) return;  // prevents incorrect pause on reload
+	function startTimer() {
+		running = true;
+		startTime = Date.now();
 
-        if (document.hidden) pauseStopwatch();
-        else resumeStopwatch();
-    });
+		timerInterval = setInterval(() => {
+			const elapsed = Date.now() - startTime;
+			const remaining = remainingMs - elapsed;
 
-    // Buttons
-    pauseBtn.onclick = pauseToggle;
-    finishBtn.onclick = finishStopwatch;
-    cancelBtn.onclick = cancelStopwatch;
+			if (remaining <= 0) {
+				clearInterval(timerInterval);
+				document.getElementById("timer").textContent = "00:00:00.0";
 
-    // Load state on entry
-    loadState();
-    updateDisplay();
+				hideActivityUI();     // 👈 NEW
+				finishStopwatch();   // reuse existing finish flow
+				return;
+			}
 
-    if (!running) startStopwatch();
+			document.getElementById("timer").textContent =
+				formatTime(remaining);
+		}, 100);
+	}
+
 		
-document.getElementById("confirmFinish").onclick = () => {
-  const energyAfter = Number(document.getElementById("finishEnergy").value);
+	document.getElementById("confirmFinish").onclick = () => {
+		const energyAfter = Number(document.getElementById("finishEnergy").value);
+		localStorage.setItem("sharedEnergy", energyAfter);
+		
+		const current = JSON.parse(localStorage.getItem("currentActivity"));
+		if (!current) return;
 
-  const current = JSON.parse(localStorage.getItem("currentActivity"));
-  if (!current) return;
+		const durationMs = elapsedBefore;
+		const durationText = formatTime(durationMs);
+		
+	const startDateObj = new Date(current.startTime || Date.now());
+	const endDateObj = new Date();
 
-  const durationMs = elapsedBefore;
-  const durationText = formatTime(durationMs);
+	const logEntry = {
+		type: "activity",
 
-  const logEntry = {
-    startDate: current.startDate,
-    activity: current.activity,
-    energyBefore: current.energyBefore,
-    energyAfter: energyAfter,
-    energyDiff: energyAfter - current.energyBefore,
-    durationMs: durationMs,
-    durationText: durationText
-  };
+		// --- timestamps ---
+		timestamp: endDateObj.getTime(),
+		startDate: startDateObj.toISOString().split("T")[0],
+		startTime: startDateObj.toLocaleTimeString("sv-SE", {
+			hour: "2-digit",
+			minute: "2-digit"
+		}),
 
-  const logs = JSON.parse(localStorage.getItem("activityLogs")) || [];
-  logs.unshift(logEntry);
+		// --- activity info ---
+		activity: current.activity || "Okänd aktivitet",
+		mode: current.mode || "stopwatch",
 
-  localStorage.setItem("activityLogs", JSON.stringify(logs));
+		// --- energy ---
+		energyBefore: current.energyBefore ?? "-",
+		energyAfter: energyAfter ?? "-",
+		energyDiff:
+			current.energyBefore != null && energyAfter != null
+				? energyAfter - current.energyBefore
+				: "-",
+
+		// --- duration ---
+		durationMs: elapsedBefore || 0,
+		durationText: formatTime(elapsedBefore || 0)
+	};
+
+
+	const logs = JSON.parse(localStorage.getItem("activityLogs")) || [];
+	logs.unshift(logEntry);
+
+	localStorage.setItem("activityLogs", JSON.stringify(logs));
 	running = false;
 	clearInterval(timerInterval);
 	elapsedBefore = 0;
 	document.getElementById("timer").textContent = "00:00:00.0";
 	pauseBtn.textContent = "Pausa";
-  localStorage.removeItem("currentActivity");
-  localStorage.removeItem("stopwatchState");
+	localStorage.removeItem("currentActivity");
+	localStorage.removeItem("stopwatchState");
 
-  window.location.href = "aktivitet3.html";
-};
+	window.location.href = "aktivitet3.html";
+	};
 
 </script>
-
-<script>
-const finishslider = document.getElementById("finishEnergy");
-const finishText = document.getElementById("finishenergyText");
-const finishPercentage = document.getElementById("finishpercentageLabel");
-
-function updateValues3(value) {
-	// Update text ranges
-	if (value < 1) {
-		finishText.textContent = "Helt utmattad";
-	} else if (value < 10) {
-		finishText.textContent = "Extremt Trött";
-	} else if (value < 20) {
-		finishText.textContent = "Väldigt Trött";
-	} else if (value < 30) {
-		finishText.textContent = "Ganska Trött";
-	} else if (value < 40) {
-		finishText.textContent = "Lite Trött";
-	} else if (value < 50) {
-		finishText.textContent = "Börjar Bli Trött";
-	} else if (value < 75) {
-		finishText.textContent = "Har Energi";
-	} else if (value < 100) {
-		finishText.textContent = "Mycket Energi";
-	} else {
-		finishText.textContent = "Helt Pigg";
-	}
-
-	// Update percentage label
-	finishPercentage.textContent = value + "%";
-};
-
-finishslider.addEventListener("input", (e) => {
-	updateValues3(e.target.value);
-});
-
-// Initialize on load
-updateValues3(finishslider.value);
-</script>
-
-<script>
-const slider5 = document.getElementById("finishEnergy");
-
-function updateSliderFill3() {
-  const value = (slider5.value - slider5.min) / (slider5.max - slider5.min) * 100;
-
-  slider5.style.background = `
-    linear-gradient(
-      to right,
-      rgb(187, 169, 233) 0%,
-      rgb(187, 169, 233) ${value}%,
-      #d3d3d3 ${value}%,
-      #d3d3d3 100%
-    )
-  `;
-}
-
-// Initialize + update on input
-slider5.addEventListener("input", updateSliderFill3);
-updateSliderFill3();
-</script>
+<script src="slider.js"></script>
 
 
 </body>
