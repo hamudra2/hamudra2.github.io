@@ -1,0 +1,46 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<a href='index.html'><div id="backBtn" class="backBtn"><button type="backBtn">Tillbaka</button></div></a>
+
+
+<div class="logs-container">
+	<ul id="energyLogList"></ul><button id="clearLogsBtn" class="clear-logs-btn">
+  Rensa all historik
+</button>
+</div>
+
+<script>
+document.getElementById("clearLogsBtn").addEventListener("click", () => {
+  const confirmClear = confirm(
+    "Är du säker på att du vill rensa all historik?"
+  );
+
+  if (!confirmClear) return;
+
+  // Clear only your app data (recommended)
+  localStorage.removeItem("energyLogs");
+  localStorage.removeItem("activityLogs");
+  localStorage.removeItem("sharedEnergy");
+  localStorage.removeItem("currentActivity");
+  localStorage.removeItem("stopwatchState");
+
+  // Clear UI
+  const list = document.getElementById("energyLogList");
+  list.innerHTML = "<li>Inga loggar än.</li>";
+});
+</script>
+
+
+<script src="slider.js"></script>
+<script src="scripts.js"></script>
+</body>
+</html>

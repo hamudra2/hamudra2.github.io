@@ -1,0 +1,151 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="buttons-container">
+	<a href='index.html'><div id="button1" class="button1"><button type="button1">Tillbaka</button></div></a>
+</div>
+
+<div id="timer">00:00:00.0</div>
+
+<button id="cancelSWBtn">Avbryt</button>
+<button id="pauseSWBtn">Pausa</button>
+<button id="finishSWBtn">Färdig</button>
+
+<script>
+    let startTime;
+    let elapsedBefore = 0;
+    let timerInterval;
+    let running = false;
+    let unloading = false; // <--- NEW
+
+    const pauseBtn = document.getElementById("pauseSWBtn");
+    const finishBtn = document.getElementById("finishSWBtn");
+    const cancelBtn = document.getElementById("cancelSWBtn");
+
+    function formatTime(ms) {
+        const tenths = Math.floor(ms / 100) % 10;
+        const seconds = Math.floor(ms / 1000) % 60;
+        const minutes = Math.floor(ms / (1000 * 60)) % 60;
+        const hours = Math.floor(ms / (1000 * 60 * 60));
+        return (
+            String(hours).padStart(2, "0") + ":" +
+            String(minutes).padStart(2, "0") + ":" +
+            String(seconds).padStart(2, "0") + "." + tenths
+        );
+    }
+
+    function updateDisplay() {
+        let total = elapsedBefore;
+        if (running) total += Date.now() - startTime;
+        document.getElementById("timer").textContent = formatTime(total);
+    }
+
+    function startStopwatch() {
+        running = true;
+        startTime = Date.now();
+        timerInterval = setInterval(updateDisplay, 100);
+        pauseBtn.textContent = "Pausa";
+        saveState();
+    }
+
+    function pauseStopwatch() {
+        if (!running) return;
+        running = false;
+        clearInterval(timerInterval);
+        elapsedBefore += Date.now() - startTime;
+        pauseBtn.textContent = "Återuppta";
+        saveState();
+    }
+
+    function resumeStopwatch() {
+        if (running) return;
+        running = true;
+        startTime = Date.now();
+        timerInterval = setInterval(updateDisplay, 100);
+        pauseBtn.textContent = "Pausa";
+        saveState();
+    }
+
+    function pauseToggle() {
+        running ? pauseStopwatch() : resumeStopwatch();
+    }
+
+    function finishStopwatch() {
+        pauseStopwatch();
+        alert("Finished at: " + formatTime(elapsedBefore));
+        localStorage.removeItem("stopwatchState");
+    }
+
+    function cancelStopwatch() {
+        running = false;
+        clearInterval(timerInterval);
+        elapsedBefore = 0;
+        document.getElementById("timer").textContent = "00:00:00.0";
+        pauseBtn.textContent = "Pausa";
+        localStorage.removeItem("stopwatchState");
+    }
+
+    function saveState() {
+        localStorage.setItem("stopwatchState", JSON.stringify({
+            elapsedBefore,
+            running,
+            startTime: running ? startTime : null
+        }));
+    }
+
+    function loadState() {
+        const saved = localStorage.getItem("stopwatchState");
+        if (!saved) return;
+
+        const state = JSON.parse(saved);
+        elapsedBefore = state.elapsedBefore || 0;
+        running = state.running;
+
+        if (running) {
+            const delta = Date.now() - state.startTime;
+            startTime = Date.now() - delta;
+            timerInterval = setInterval(updateDisplay, 100);
+            pauseBtn.textContent = "Pausa";
+        } else {
+            pauseBtn.textContent = "Återuppta";
+        }
+    }
+
+    // --- FIXED: Do NOT auto-pause during page reload ---
+    window.addEventListener("beforeunload", () => {
+        unloading = true;
+        saveState();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+        if (unloading) return;  // prevents incorrect pause on reload
+
+        if (document.hidden) pauseStopwatch();
+        else resumeStopwatch();
+    });
+
+    // Buttons
+    pauseBtn.onclick = pauseToggle;
+    finishBtn.onclick = finishStopwatch;
+    cancelBtn.onclick = cancelStopwatch;
+
+    // Load state on entry
+    loadState();
+    updateDisplay();
+
+    if (!running) startStopwatch();
+</script>
+
+
+
+
+</body>
+</html>
