@@ -1,0 +1,82 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<a href='index.html'><div id="backBtn" class="backBtn"><button type="backBtn">Tillbaka</button></div></a>
+
+
+<div class="logs-container">
+	<h2 class="logs-h2">Historia</h2>
+  <ul id="energyLogList"></ul>
+</button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const list = document.getElementById("energyLogList");
+
+  const energyLogs = JSON.parse(localStorage.getItem("energyLogs")) || [];
+  const activityLogs = JSON.parse(localStorage.getItem("activityLogs")) || [];
+
+  const combined = [];
+
+  energyLogs.forEach(log => {
+    if (!log.timestamp) return;
+
+    combined.push({
+      timestamp: log.timestamp,
+      html: `
+        <strong>${log.date} ${log.time}</strong><br>
+        Energi: ${log.value}%
+        <hr>
+      `
+    });
+  });
+
+  activityLogs.forEach(log => {
+    if (!log.timestamp) return;
+
+    combined.push({
+      timestamp: log.timestamp,
+      html: `
+        <strong>${log.startDate} ${log.startTime}</strong><br>
+        Aktivitet: ${log.activity}<br>
+        Läge: ${log.mode === "timer" ? "Timer" : "Stoppur"}<br>
+        Energi före: ${log.energyBefore}%<br>
+        Energi efter: ${log.energyAfter}%<br>
+        Skillnad: ${log.energyDiff}%<br>
+        Tid: ${log.durationText}
+        <hr>
+      `
+    });
+  });
+
+  combined.sort((a, b) => b.timestamp - a.timestamp);
+
+  if (combined.length === 0) {
+    list.innerHTML = "<li>Inga loggar än.</li>";
+    return;
+  }
+
+  combined.forEach(entry => {
+    const li = document.createElement("li");
+    li.innerHTML = entry.html;
+    list.appendChild(li);
+  });
+});
+</script>
+
+
+
+
+<script src="slider.js"></script>
+<script src="scripts.js"></script>
+</body>
+</html>

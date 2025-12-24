@@ -1,0 +1,63 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page-test">
+
+<a href='index.html'><div id="backBtn" class="backBtn"><button type="backBtn">Tillbaka</button></div></a>
+
+
+<div class="buttons-container">
+	<div class="penguinoutfitcontainer">
+		<div class="poutfitcontainer-finished">
+			<img class="outfittoggle" id="toutfit1" src="images/toutfit1.png">
+			<img class="outfittoggle" id="toutfit2" src="images/toutfit2.png">
+			<img class="outfittoggle" id="toutfit3" src="images/toutfit3.png">
+			<img class="outfittoggle" id="toutfit4" src="images/toutfit4.png">
+		</div>
+	</div>
+
+	<div id="brajobbattext3">Bra jobbat!</div>
+	<div id="brajobbatcontainer3">
+		<img id="brajobbatpingvin" src="images/klarat-aktivitet3.png">
+	</div>
+		
+	<br>
+	<br>
+	<br>
+	<br>
+		
+<div id="finishModal" style="display:block">
+  <h2>Hur mycket energi har du nu?</h2>
+	<span id="finishpercentageLabel">50%</span>
+  <input type="range" id="finishEnergy" min="0" max="100" value="50">
+	<p id="finishenergyText">Har Energi</p>
+  <button id="confirmFinish">Spara</button>
+</div>
+</div>
+
+<script>
+const OUTFIT_KEY = "penguinOutfits";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const outfits = JSON.parse(localStorage.getItem(OUTFIT_KEY)) || {};
+
+  Object.keys(outfits).forEach(outfitId => {
+    const outfit = document.getElementById(outfitId);
+    if (!outfit) return;
+
+    outfit.style.display = outfits[outfitId] ? "flex" : "none";
+  });
+});
+</script>
+<script src="outfits.js"></script>
+<script src="slider.js"></script>
+<script src="scripts.js"></script>
+
+</body>
+</html>

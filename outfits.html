@@ -1,0 +1,60 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<a href='index.html'><div id="backBtn2" class="backBtn2"><button type="backBtn2">Tillbaka</button></div></a>
+
+<div class="penguinoutfitcontainer">
+	<div class="poutfitcontainer">
+		<img id="basepenguin" src="images/poutfit0.png">
+		<img class="outfittoggle" id="toutfit1" src="images/toutfit1.png">
+		<img class="outfittoggle" id="toutfit2" src="images/toutfit2.png">
+		<img class="outfittoggle" id="toutfit3" src="images/toutfit3.png">
+		<img class="outfittoggle" id="toutfit4" src="images/toutfit4.png">
+	</div>
+</div>
+
+<div class="buttons-container">
+	<div class="outfit-container">
+	
+		<button data-outfits="toutfit1,toutfit1-2" id="outfitbutton1" onclick="toggleOutfitGroup(this)">
+			<img src="images/outfit-1.png">
+		</button>
+	
+		<button data-outfits="toutfit2,toutfit2-2" id="outfitbutton2" onclick="toggleOutfitGroup(this)">
+			<img src="images/outfit-2.png">
+		</button>
+	
+		<button data-outfits="toutfit3,toutfit3-2" id="outfitbutton3" onclick="toggleOutfitGroup(this)">
+			<img src="images/outfit-3.png">
+		</button>
+	
+		<button data-outfits="toutfit4,toutfit4-2" id="outfitbutton4" onclick="toggleOutfitGroup(this)">
+			<img src="images/outfit-4.png">
+		</button>
+		
+	</div>
+</div>
+
+<!--
+<div class="outfit-loader">
+	<img src="images/toutfit1.png">
+	<img src="images/toutfit2.png">
+	<img src="images/toutfit3.png">
+	<img src="images/toutfit4.png">
+</div>
+-->
+
+<script src="outfits.js"></script>
+<script src="slider.js"></script>
+<script src="scripts.js"></script>
+</body>
+</html>

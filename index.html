@@ -1,0 +1,132 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	
+<div class="buttons-containeragain">
+	<div class="adhdtitel">ADHD-APP</div>
+</div>
+
+<div class="penguinoutfitcontainer">
+	<div class="poutfitcontainer">
+		<img id="basepenguin" src="images/poutfit0.png">
+		<img class="outfittoggle" id="toutfit1" src="images/toutfit1.png">
+		<img class="outfittoggle" id="toutfit2" src="images/toutfit2.png">
+		<img class="outfittoggle" id="toutfit3" src="images/toutfit3.png">
+		<img class="outfittoggle" id="toutfit4" src="images/toutfit4.png">
+	</div>
+</div>
+
+<div class="energylogbuttoncontainer">
+	<div id="energyLogButton"><button type="button4"><div class="container4"><span class="button-width">Energi</span></div></button></div>
+	<br>
+	<input
+		type="range"
+		id="readonlySlider-slider"
+		min="0"
+		max="100"
+		value="50"
+		disabled
+	>
+</div>
+
+<div class="buttons-container">
+	<div id="button2" class="button2"><button type="button2">Starta Aktivitet</button></div>
+	<a href='outfits.html'><div id="button3" class="button3"><button type="button3">Outfits</button></div></a>
+	<a href='logs.html'><div id="button1" class="button1"><button type="button1">Historia</button></div></a>
+</div>
+
+<div id="energyLogModal" class="energyLogModal">
+	<div class="energyLogModal-content">
+	<h2 class="energyLogModalh2">Hur mycket energi har du?</h2>
+		<div class="slider-wrapper">
+			<div class="slider-header">
+				<label for="energySlider" class="slider-label">Nuvarande Energinivå</label>
+				<span></span> <!-- empty for spacing -->
+				<span id="percentageLabel">50%</span>
+			</div>
+			<input type="range" id="energySlider" class="energySliders" min="0" max="100" value="50" step="1">
+			<p id="energyText">Helt utmattad</p>
+		</div>
+		<button class="energyLogCloseButton">Avbryt</button>
+		<button class="energyLogAcceptButton">Spara</button>
+	</div>
+</div>
+
+
+
+
+
+<div id="activityModal" class="activityModal">
+  <div class="activityModal-content">
+
+    <!-- ENERGY SLIDER -->
+    <div class="activityslider-wrapper">
+      <div class="activityslider-header">
+        <label for="activityenergySlider" class="activityslider-label">Nuvarande Energinivå</label>
+        <span id="activitypercentageLabel">50%</span>
+      </div>
+
+      <input
+        type="range"
+        id="activityenergySlider"
+        min="0"
+        max="100"
+        value="50"
+        step="1"
+      >
+
+      <p id="activityenergyText">Har Energi</p>
+    </div>
+
+	<div class="activityModeContainer">
+		<button id="modeStopwatch" class="modeBtn selected">Stoppur</button>
+		<button id="modeTimer" class="modeBtn">Timer</button>
+	</div>
+
+	<h2>Vilken aktivitet ska du göra?</h2>
+	<!-- ACTIVITY BUTTONS -->
+	<div class="activityBtnGrid">
+		<button class="activityBtn" data-activity="Diska">Diska</button>
+		<button class="activityBtn" data-activity="Städa Sovrummet">Städa Sovrummet</button>
+		<button class="activityBtn" data-activity="Studera">Studera</button>
+		<button class="activityBtn" data-activity="Dammsug">Dammsug</button>
+
+		<button id="activityBtnClose" class="activityBtnClose">Avbryt</button>
+		<button id="activityStartBtn" class="activityStartBtn">Starta</button>
+	</div>
+
+  </div>
+</div>
+
+
+
+
+<script>
+const OUTFIT_KEY = "penguinOutfits";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const outfits = JSON.parse(localStorage.getItem(OUTFIT_KEY)) || {};
+
+  Object.keys(outfits).forEach(outfitId => {
+    const outfit = document.getElementById(outfitId);
+    if (!outfit) return;
+
+    outfit.style.display = outfits[outfitId] ? "flex" : "none";
+  });
+});
+</script>
+<script src="outfits.js"></script>
+<script src="slider.js"></script>
+<script src="scripts.js"></script>
+</body>
+
+</html>
+
+
