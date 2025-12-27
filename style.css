@@ -550,7 +550,7 @@ button {
   margin: 1vw;
   border: none;
   cursor: pointer;
-  background-color: rgb(240, 190, 140);
+  background-color: #09BBC9;
 }
 
 .modeBtn.selected {
@@ -736,4 +736,5 @@ button {
 #poutfitcontainer-diskar .outfittoggle {
 	margin-top: 7vh;
 	margin-left: 10vw;
+
 }
