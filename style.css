@@ -579,6 +579,15 @@ button {
 	font-weight: 900;
 }
 
+#basefish {
+	max-width: 100%;
+	position: relative;
+	display: relative;
+	margin-top: -12vh;
+	margin-bottom: -13vh;
+	pointer-events: none;
+}
+
 .mataBtn {
   background-color: rgb(154, 225, 195);
 	z-index: 2;      
@@ -591,7 +600,7 @@ button {
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-	padding: 1%;
+	padding: 3%;
 }
 
 .outfit-container {
