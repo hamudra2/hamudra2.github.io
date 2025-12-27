@@ -10,13 +10,42 @@
 <body>
 <a href='index.html'><div id="backBtn" class="backBtn"><button type="backBtn">Tillbaka</button></div></a>
 
+<div class="penguinoutfitcontainer">
+	<div class="poutfitcontainer">
+		<img id="basepenguin" src="images/happy_poutfit0.png">
+		<img class="outfittoggle" id="toutfit1" src="images/toutfit1.png">
+		<img class="outfittoggle" id="toutfit2" src="images/toutfit2.png">
+		<img class="outfittoggle" id="toutfit3" src="images/toutfit3.png">
+		<img class="outfittoggle" id="toutfit4" src="images/toutfit4.png">
+	</div>
+</div>
+
 <div class="avklaradAktivitetContainer">
 	<div class="matadjuret">Du har klarat av en aktivitet!</div>
 	<div class="garderobdjuret">Du har låst upp 1 garderobsbyte!</div>
 	<br>
+	<img id="basefish" src="images/fish0.png">
 	<a href='index.html'><button class="mataBtn">Mata Pingvinen</button></a>
 </div>
 
+
+<script>
+const OUTFIT_KEY = "penguinOutfits";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const outfits = JSON.parse(localStorage.getItem(OUTFIT_KEY)) || {};
+
+  Object.keys(outfits).forEach(outfitId => {
+    const outfit = document.getElementById(outfitId);
+    if (!outfit) return;
+
+    outfit.style.display = outfits[outfitId] ? "flex" : "none";
+  });
+});
+</script>
+<script src="outfits.js"></script>
+<script src="slider.js"></script>
+<script src="scripts.js"></script>
 </body>
 </html>
 
