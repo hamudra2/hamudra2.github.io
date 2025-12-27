@@ -13,6 +13,7 @@
 	<div class="adhdtitel">ADHD-APP</div>
 </div>
 
+<!-- Animal Friend on the front screen, with outfits chosen on the outfits.html -->
 <div class="penguinoutfitcontainer">
 	<div class="poutfitcontainer">
 		<img id="basepenguin" src="images/poutfit0.png">
@@ -22,7 +23,9 @@
 		<img class="outfittoggle" id="toutfit4" src="images/toutfit4.png">
 	</div>
 </div>
+<!-- End of Animal Friend -->
 
+<!-- Energy Button and slider below penguin -->
 <div class="energylogbuttoncontainer">
 	<div id="energyLogButton"><button type="button4"><div class="container4"><span class="button-width">Energi</span></div></button></div>
 	<br>
@@ -35,13 +38,17 @@
 		disabled
 	>
 </div>
+<!-- End of Energy Button -->
 
+<!-- Container for the buttons on the front page -->
 <div class="buttons-container">
 	<div id="button2" class="button2"><button type="button2">Starta Aktivitet</button></div>
 	<a href='outfits.html'><div id="button3" class="button3"><button type="button3">Outfits</button></div></a>
 	<a href='logs.html'><div id="button1" class="button1"><button type="button1">Historia</button></div></a>
 </div>
+<!-- End of container for buttons -->
 
+<!-- The button to pop up the function where you choose how much energy you have -->
 <div id="energyLogModal" class="energyLogModal">
 	<div class="energyLogModal-content">
 	<h2 class="energyLogModalh2">Hur mycket energi har du?</h2>
@@ -58,21 +65,20 @@
 		<button class="energyLogAcceptButton">Spara</button>
 	</div>
 </div>
+<!-- END -->
 
 
 
-
-
+<!-- The container for the button and functions of the activity starter -->
 <div id="activityModal" class="activityModal">
   <div class="activityModal-content">
-
-    <!-- ENERGY SLIDER -->
+	<!-- Energy Slider for Activity Starter-->
     <div class="activityslider-wrapper">
       <div class="activityslider-header">
         <label for="activityenergySlider" class="activityslider-label">Nuvarande Energinivå</label>
         <span id="activitypercentageLabel">50%</span>
       </div>
-
+		
       <input
         type="range"
         id="activityenergySlider"
@@ -84,12 +90,15 @@
 
       <p id="activityenergyText">Har Energi</p>
     </div>
+	<!-- END -->
 
+	<!-- Choose whether you want a timer or a stopwatch -->
 	<div class="activityModeContainer">
 		<button id="modeStopwatch" class="modeBtn selected">Stoppur</button>
 		<button id="modeTimer" class="modeBtn">Timer</button>
 	</div>
-
+	<!-- END -->
+	  
 	<h2>Vilken aktivitet ska du göra?</h2>
 	<!-- ACTIVITY BUTTONS -->
 	<div class="activityBtnGrid">
@@ -101,7 +110,8 @@
 		<button id="activityBtnClose" class="activityBtnClose">Avbryt</button>
 		<button id="activityStartBtn" class="activityStartBtn">Starta</button>
 	</div>
-
+	<!-- END -->
+	  
   </div>
 </div>
 
@@ -128,5 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
 </body>
 
 </html>
+
 
 
